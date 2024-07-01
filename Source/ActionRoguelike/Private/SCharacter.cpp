@@ -13,12 +13,13 @@ ASCharacter::ASCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SprintArmComp");
-
+	SpringArmComp->bUsePawnControlRotation = true;
 	CameraComp = CreateDefaultSubobject<UCameraComponent>("CameraComp");
 
 	SpringArmComp->SetupAttachment(RootComponent);
 	CameraComp->SetupAttachment(SpringArmComp);
-	
+
+	bUseControllerRotationYaw = false;
 }
 
 // Called when the game starts or when spawned
@@ -40,13 +41,20 @@ void ASCharacter::MoveForward(float X)
 	AddMovementInput(GetActorForwardVector(),X);
 }
 
+void ASCharacter::MoveRight(float X)
+{
+	AddMovementInput(GetActorRightVector(),X);
+}
+
 // Called to bind functionality to input
 void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAxis("MoveForward",this,&ASCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight",this,&ASCharacter::MoveRight);
 
 	PlayerInputComponent->BindAxis("Turn",this,&APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("LookUp",this,&APawn::AddControllerPitchInput);
 }
 
