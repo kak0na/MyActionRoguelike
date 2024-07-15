@@ -3,6 +3,7 @@
 
 #include "SCharacter.h"
 
+#include "SMagicProjectile.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -38,12 +39,35 @@ void ASCharacter::Tick(float DeltaTime)
 
 void ASCharacter::MoveForward(float X)
 {
-	AddMovementInput(GetActorForwardVector(),X);
+	FRotator ControlRot = GetControlRotation();
+	ControlRot.Roll = 0.0f;
+	ControlRot.Pitch = 0.0f;
+	
+	//AddMovementInput(GetActorForwardVector(),X);
+	AddMovementInput(ControlRot.Vector(),X);
 }
 
 void ASCharacter::MoveRight(float X)
 {
-	AddMovementInput(GetActorRightVector(),X);
+	FRotator ControlRot = GetControlRotation();
+	ControlRot.Roll = 0.0f;
+	ControlRot.Pitch = 0.0f;
+	FVector RightVector = FRotationMatrix(ControlRot).GetScaledAxis(EAxis::Y);
+	//AddMovementInput(GetActorRightVector(),X);
+	AddMovementInput(RightVector,X);
+}
+
+void ASCharacter::PrimaryAttack()
+{
+	FVector HandVector = GetMesh()->GetSocketLocation("Muzzle_01");
+	
+	FTransform SpawnTM = FTransform(GetActorRotation(),HandVector);
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	GetWorld()->SpawnActor<AActor>(ProjectileClass,SpawnTM,SpawnParams);
+
 }
 
 // Called to bind functionality to input
@@ -56,5 +80,7 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 	PlayerInputComponent->BindAxis("Turn",this,&APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp",this,&APawn::AddControllerPitchInput);
+
+	PlayerInputComponent->BindAction("PrimaryAttack",IE_Pressed,this,&ASCharacter::PrimaryAttack);
 }
 

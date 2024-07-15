@@ -28,12 +28,16 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UCameraComponent* CameraComp;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> ProjectileClass;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	void MoveForward(float X);
 	void MoveRight(float X);
+	void PrimaryAttack();
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
